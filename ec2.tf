@@ -1,3 +1,14 @@
+# configured to set up terraform cloud integration
+terraform {
+  cloud {
+    organization = "tosin-ojo"
+
+    workspaces {
+      name = "rentzone-aws-github-action"
+    }
+  }
+}
+
 # configured aws provider with proper credentials
 provider "aws" {
   region  = "us-east-1"
