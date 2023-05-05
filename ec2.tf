@@ -15,18 +15,6 @@ provider "aws" {
 
 }
 
-/*
-# store the terraform state file in s3
-terraform {
-  backend "s3" {
-    bucket  = "tosin-a-ojo-terraform-state-bucket"
-    key     = "build/terraform.tfstate"  // statefile for the project
-    region  = "us-east-1"
-    profile = "terraform-user"
-  }
-}
-*/
-
 # create default vpc if one does not exit
 resource "aws_default_vpc" "default_vpc" {
 
