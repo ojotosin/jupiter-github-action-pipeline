@@ -26,8 +26,7 @@ jobs:
       - name: Terraform Init
         run: |
           terraform init -input=false \
-            -backend-config="workspace=${{ env.TF_WORKSPACE_NAME }}" \
-            -backend-config="organization=${{ env.TF_ORGANIZATION_NAME }}"
+          
 
       - name: Terraform Plan
         run: |
