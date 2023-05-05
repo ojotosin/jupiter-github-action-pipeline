@@ -12,7 +12,7 @@ env:
 
 jobs:
   terraform:
-    name: "Deploy to AWS"
+    name: "Terraform cloud to aws"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -26,12 +26,48 @@ jobs:
       - name: Terraform Init
         run: |
           terraform init -input=false \
-          
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color          
 
       - name: Terraform Plan
-        run: |
-          terraform plan -out=tfplan \
-            -var-file="path/to/vars.tfvars"
+        if: github.event_name == 'pull_request'
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.0.5
+       run: |
+          terraform init
+          terraform plan -out=tfplan
+
+      - name: Comment PR with Terraform plan
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data } = await github.repos.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            })
+            const commentBody = `
+            **Terraform Plan:**
+            <details><summary>Show/Hide</summary>
+            \`\`\`diff\n${{ steps.terraform-plan.outputs.plan_output }}\n\`\`\`
+            </details>
+            `
+            await github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            })
+
+      - name: Fail if Terraform plan fails
+        if: steps.terraform-plan.outcome == 'failure'
+        run: exit 1
 
       - name: Terraform Apply
         if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
