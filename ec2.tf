@@ -112,7 +112,7 @@ resource "aws_instance" "ec2_instance" {
   user_data              = file("server-bootstrap.sh")
 
   tags = {
-    Name = "jupiter server"
+    Name = "jupiter-server"
   }
 }
 
