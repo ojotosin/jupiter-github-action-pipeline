@@ -3,9 +3,9 @@ sudo su
 yum update -y
 yum install -y httpd
 cd /var/www/html
-wget https://github.com/azeezsalu/jupiter/archive/refs/heads/main.zip
-unzip main.zip
+wget https://github.com/ojotosin/jupiter-github-action-pipeline/raw/main/jupiter-main.zip
+unzip jupiter-main.zip
 cp -r jupiter-main/* /var/www/html/
-rm -rf jupiter-main main.zip
+rm -rf jupiter-main jupiter-main.zip
 systemctl enable httpd 
 systemctl start httpd
