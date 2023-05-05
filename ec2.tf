@@ -4,7 +4,7 @@ terraform {
     organization = "tosin-ojo"
 
     workspaces {
-      name = "rentzone-aws-github-action"
+      name = "jupiter-github-action-pipeline"
     }
   }
 }

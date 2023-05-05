@@ -44,9 +44,9 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v5
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GH_TOKEN }}
           script: |
             const { data } = await github.repos.get({
               owner: context.repo.owner,
