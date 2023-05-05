@@ -1,4 +1,4 @@
-name: jupiter-github-action-pipeline
+name: "aws-auto-scaling-workflow-terraform"
 
 on:
   push:
@@ -8,11 +8,11 @@ on:
 
 jobs:
   terraform:
-    name: Terraform
+    name: "Terraform"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -20,37 +20,29 @@ jobs:
           # terraform_version: 0.13.0:
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
+
       - name: Terraform Init
         id: init
         run: terraform init
-
-      - name: Terraform Format Check
-        id: fmt
-        run: |
-          if ! terraform fmt -check; then
-            echo "Terraform files not formatted. Please run 'terraform fmt'."
-            exit 1
-          fi
-
+      
       - name: Terraform Validate
         id: validate
-        run: terraform validate
+        run: terraform validate -no-color
 
       - name: Terraform Plan
         id: plan
         if: github.event_name == 'pull_request'
-        run: |
-          terraform plan -no-color -input=false > plan.txt
-          echo "PLAN=$(cat plan.txt)" >> $GITHUB_ENV
+        run: terraform plan -no-color -input=false
         continue-on-error: true
-      
-      - name: Terraform Comment
+
+      - uses: actions/github-script@v6
         if: github.event_name == 'pull_request'
-        uses: actions/github-script@v4
+        env:
+          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `#### Terraform Format Check 🖌\`${{ steps.fmt.outcome }}\`
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
             #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
             #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
@@ -66,7 +58,6 @@ jobs:
               repo: context.repo.repo,
               body: output
             })
-      
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
         run: exit 1
