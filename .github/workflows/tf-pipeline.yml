@@ -5,11 +5,6 @@ on:
     branches:
       - main
 
-env:
-  TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
-  TF_WORKSPACE_NAME: "jupiter-github-action-pipeline"
-  TF_ORGANIZATION_NAME: "tosin-ojo"
-
 jobs:
   terraform:
     name: "Terraform cloud to aws"
@@ -33,9 +28,6 @@ jobs:
 
       - name: Terraform Plan
         if: github.event_name == 'pull_request'
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.0.5
         run: |
           terraform init
           terraform plan -out=tfplan
